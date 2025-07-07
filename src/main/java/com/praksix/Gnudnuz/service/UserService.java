@@ -38,7 +38,7 @@ public class UserService {
 
     public User updateUser(String id, User user) {
         User existingUser = getUserById(id);
-        existingUser.setName(user.getName());
+        existingUser.setUsername(user.getUsername());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
         existingUser.setUpdatedAt(LocalDateTime.now());
@@ -47,15 +47,6 @@ public class UserService {
 
     public void deleteUser(String id) {
         userRepository.deleteById(id);
-    }
-
-    //Other operations
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-    
-    public User findByEmailAndPassword(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password);
     }
 
     

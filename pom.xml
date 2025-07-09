@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.praksix</groupId>
-	<artifactId>Gnudnuz</artifactId>
+	<artifactId>Gudnuz</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Gnudnuz</name>
+	<name>Gudnuz</name>
 	<description>Premier projet spring boot</description>
 	<url/>
 	<licenses>

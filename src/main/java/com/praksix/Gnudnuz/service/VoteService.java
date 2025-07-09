@@ -40,23 +40,34 @@ public class VoteService {
      * Basculer le vote d'un utilisateur pour un post (ajouter/supprimer)
      */
     public VoteResponse toggleVote(String postId, String authorId) {
-        Vote existingVote = voteRepository.findByPostIdAndAuthorId(postId, authorId);
-        
-        if (existingVote != null) {
-            // L'utilisateur a déjà voté, on supprime le vote
-            voteRepository.delete(existingVote);
-            updateNuzVoteCount(postId, -1);
-            int newVoteCount = (int) voteRepository.countByPostId(postId);
-            return new VoteResponse(false, newVoteCount);
-        } else {
-            // L'utilisateur n'a pas encore voté, on ajoute le vote
-            Vote newVote = new Vote();
-            newVote.setPostId(postId);
-            newVote.setAuthorId(authorId);
-            voteRepository.save(newVote);
-            updateNuzVoteCount(postId, 1);
-            int newVoteCount = (int) voteRepository.countByPostId(postId);
-            return new VoteResponse(true, newVoteCount);
+        try {
+            System.out.println("Toggle vote - postId: " + postId + ", authorId: " + authorId);
+            
+            Vote existingVote = voteRepository.findByPostIdAndAuthorId(postId, authorId);
+            System.out.println("Existing vote found: " + (existingVote != null));
+            
+            if (existingVote != null) {
+                // L'utilisateur a déjà voté, on supprime le vote
+                voteRepository.delete(existingVote);
+                updateNuzVoteCount(postId, -1);
+                int newVoteCount = (int) voteRepository.countByPostId(postId);
+                System.out.println("Vote removed, new count: " + newVoteCount);
+                return new VoteResponse(false, newVoteCount);
+            } else {
+                // L'utilisateur n'a pas encore voté, on ajoute le vote
+                Vote newVote = new Vote();
+                newVote.setPostId(postId);
+                newVote.setAuthorId(authorId);
+                voteRepository.save(newVote);
+                updateNuzVoteCount(postId, 1);
+                int newVoteCount = (int) voteRepository.countByPostId(postId);
+                System.out.println("Vote added, new count: " + newVoteCount);
+                return new VoteResponse(true, newVoteCount);
+            }
+        } catch (Exception e) {
+            System.err.println("Error in toggleVote: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
     

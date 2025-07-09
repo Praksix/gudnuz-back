@@ -156,9 +156,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestParam String userId) {
+    public ResponseEntity<Void> logout(@RequestParam(required = false) String userId) {
         try {
-            service.logout(userId);
+            if (userId != null) {
+                service.logout(userId);
+            }
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -185,7 +187,7 @@ public class AuthController {
             // Créer le UserDto
             UserDto userDto = UserDto.builder()
                     .id(user.getId())
-                    .username(user.getUsername())
+                    .username(user.getDisplayUsername())
                     .email(user.getEmail())
                     .role(user.getRole())
                     .status(user.getStatus())

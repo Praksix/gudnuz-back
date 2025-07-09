@@ -21,6 +21,7 @@ public class Nuz {
     private String title;
     private String content;
     private String authorId;
+    private String authorUsername;
     private Integer voteCount;
     
     @CreatedDate

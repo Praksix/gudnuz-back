@@ -1,6 +1,8 @@
 package com.praksix.Gnudnuz.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -130,10 +132,14 @@ public class VoteController {
      * Compter les votes d'un post
      */
     @GetMapping("/count/{postId}")
-    public ResponseEntity<Long> getVoteCountByPostId(@PathVariable String postId) {
+    public ResponseEntity<Map<String, Object>> getVoteCountByPostId(@PathVariable String postId) {
         try {
             long count = voteService.getVoteCountByPostId(postId);
-            return ResponseEntity.ok(count);
+            Map<String, Object> response = new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
+            data.put("count", count);
+            response.put("data", data);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -144,12 +150,16 @@ public class VoteController {
      * Vérifier si un utilisateur a voté pour un post
      */
     @GetMapping("/check")
-    public ResponseEntity<Boolean> hasUserVoted(
+    public ResponseEntity<Map<String, Object>> hasUserVoted(
             @RequestParam String postId,
             @RequestParam String authorId) {
         try {
             boolean hasVoted = voteService.hasUserVoted(postId, authorId);
-            return ResponseEntity.ok(hasVoted);
+            Map<String, Object> response = new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
+            data.put("hasVoted", hasVoted);
+            response.put("data", data);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

@@ -27,19 +27,30 @@ public class AuthenticationService {
     private AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
+        // Validation des données d'entrée
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("L'email est requis");
+        }
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("Le nom d'utilisateur est requis");
+        }
+        if (request.getPassword() == null || request.getPassword().length() < 6) {
+            throw new RuntimeException("Le mot de passe doit contenir au moins 6 caractères");
+        }
+        
         // Vérifier si l'email existe déjà
-        if (repository.existsByEmail(request.getEmail())) {
+        if (repository.existsByEmail(request.getEmail().toLowerCase().trim())) {
             throw new RuntimeException("Email déjà utilisé");
         }
         
         // Vérifier si le username existe déjà
-        if (repository.existsByUsername(request.getUsername())) {
+        if (repository.existsByUsername(request.getUsername().trim())) {
             throw new RuntimeException("Nom d'utilisateur déjà utilisé");
         }
 
         var user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
+                .username(request.getUsername().trim())
+                .email(request.getEmail().toLowerCase().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
                 .status("ACTIVE")
@@ -51,28 +62,36 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
-                .username(user.getUsername())
+                .username(user.getDisplayUsername())
                 .email(user.getEmail())
                 .expiresIn(86400000) // 24h
                 .build();
     }
 
     public AuthResponse authenticate(LoginRequest request) {
+        // Validation des données d'entrée
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("L'email est requis");
+        }
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new RuntimeException("Le mot de passe est requis");
+        }
+        
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        request.getEmail().toLowerCase().trim(),
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail())
-                .orElseThrow();
+        var user = repository.findByEmail(request.getEmail().toLowerCase().trim())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         return AuthResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
-                .username(user.getUsername())
+                .username(user.getDisplayUsername())
                 .email(user.getEmail())
                 .expiresIn(86400000) // 24h
                 .build();
@@ -94,7 +113,7 @@ public class AuthenticationService {
                         .token(newAccessToken)
                         .refreshToken(newRefreshToken)
                         .userId(user.getId())
-                        .username(user.getUsername())
+                        .username(user.getDisplayUsername())
                         .email(user.getEmail())
                         .expiresIn(86400000) // 24h
                         .build();

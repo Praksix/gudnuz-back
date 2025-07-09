@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.praksix.Gnudnuz.model.Nuz;
+import com.praksix.Gnudnuz.model.User;
 import com.praksix.Gnudnuz.service.NuzService;
+import com.praksix.Gnudnuz.service.UserService;
 
 @RestController
 @CrossOrigin(origins = "*") // Pour permettre les requêtes CORS
@@ -24,10 +28,23 @@ public class NuzController {
 
     @Autowired
     private NuzService nuzService;
+    
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Nuz createNuz(@RequestBody Nuz nuz) {
+        // Récupérer l'utilisateur connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        User currentUser = userService.findByEmail(userEmail);
+        
+        // Définir l'auteur du Nuz
+        nuz.setAuthorId(currentUser.getId());
+        // Utiliser le vrai username au lieu de l'email
+        nuz.setAuthorUsername(currentUser.getDisplayUsername());
+        
         return nuzService.createUser(nuz);
     }
 

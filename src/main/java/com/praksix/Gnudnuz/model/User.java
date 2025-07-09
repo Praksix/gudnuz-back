@@ -54,6 +54,11 @@ public class User implements UserDetails {
     public String getUsername() {
         return email; // Using email as username for authentication
     }
+    
+    // Méthode pour obtenir le vrai username (pas l'email)
+    public String getDisplayUsername() {
+        return username;
+    }
 
     @Override
     public boolean isAccountNonExpired() {

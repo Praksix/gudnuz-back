@@ -29,8 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/votes/winner").permitAll()
                 .requestMatchers("/api/votes/top").permitAll()
-                .requestMatchers("/api/nuzs").permitAll()
-                .requestMatchers("/api/nuzs/{id}").permitAll()
+                .requestMatchers("/api/nuzs/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

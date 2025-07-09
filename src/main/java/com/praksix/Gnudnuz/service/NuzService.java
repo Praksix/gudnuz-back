@@ -15,6 +15,8 @@ public class NuzService {
     private NuzRepository nuzRepository;
 
     public Nuz createUser(Nuz nuz) {
+        // Initialiser voteCount à 1 lors de la création
+        nuz.setVoteCount(1);
         return nuzRepository.save(nuz);
     }
 

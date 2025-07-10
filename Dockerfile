@@ -1,14 +1,32 @@
-# Utiliser l'image OpenJDK 21 officielle
-FROM openjdk:21-jdk-slim
+# Stage 1: Build
+FROM openjdk:17-jdk-slim AS build
 
-# Définir le répertoire de travail
+WORKDIR /Gudnuz
+
+# Copier les fichiers de configuration Maven
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
+
+# Rendre mvnw exécutable
+RUN chmod +x ./mvnw
+
+# Copier le code source
+COPY src src
+
+# Construire l'application
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Runtime
+FROM openjdk:17-jre-slim
+
 WORKDIR /app
 
-# Copier le fichier JAR de l'application
-COPY target/Gudnuz-0.0.1-SNAPSHOT.jar app.jar
+# Copier le JAR depuis le stage de build
+COPY --from=build /app/target/*.jar app.jar
 
-# Exposer le port 8080
+# Exposer le port
 EXPOSE 8080
 
-# Commande pour démarrer l'application
-ENTRYPOINT ["java", "-jar", "app.jar"] 
+# Lancer l'application
+CMD ["java", "-jar", "app.jar"]
